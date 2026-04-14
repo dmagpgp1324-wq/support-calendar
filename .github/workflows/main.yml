@@ -1,0 +1,36 @@
+name: Update Support Calendar
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 1 * * *"
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 코드 가져오기
+        uses: actions/checkout@v4
+
+      - name: Python 설치
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 패키지 설치
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 캘린더 생성
+        run: |
+          python main.py
+
+      - name: Firebase 배포
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_SUPPORTCALENDAR_135B3 }}"
+          repoToken: "${{ secrets.GITHUB_TOKEN }}"
+          projectId: "supportcalendar-135b3"
+          channelId: live
